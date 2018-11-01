@@ -1,0 +1,12 @@
+#!/bin/bash
+
+rm /root/.horticulturalist.lock 2> /dev/null
+/srv/software/horticulturalist/bin/svc-stop medic-api
+
+echo Launching initial replication script
+cd /srv/software/offline_sync
+node src/initialReplication || { echo 'FATAL: Initial replication failure'; exit -1; }
+
+echo Launching horticulturalist
+cd /srv/software/horticulturalist
+node src --satellite || { echo 'FATAL: Horticulturalist failure'; exit -1; }

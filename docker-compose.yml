@@ -1,0 +1,45 @@
+version: '3'
+services:
+  couch:
+    image: apache/couchdb:2.2.0
+    container_name: couch
+    volumes:
+     - ./couchdb-local.ini:/opt/couchdb/etc/local.ini
+    ports:
+     - "6984:5984"
+    expose:
+     - 5984
+    extra_hosts:
+     - "upstream: 192.168.0.139"
+
+  horti:
+    image: node:8
+    container_name: horti
+    links:
+     - couch
+    volumes:
+     - ~/horticulturalist:/srv/software/horticulturalist
+     - .:/srv/software/offline_sync
+    entrypoint: /bin/bash
+    command: "/srv/software/offline_sync/horti-entrypoint"
+    environment:
+     - COUCH_NODE_NAME=couchdb@satellite
+     - COUCH_URL=http://medic:pwd123@couch:5984/medic
+    ports:
+     - "6988:5988"
+    extra_hosts:
+     - "upstream: 192.168.0.139"
+
+  sync:
+    image: node:8
+    container_name: sync
+    links:
+     - couch
+     - horti
+    volumes:
+     - .:/srv/software/offline_sync
+    extra_hosts:
+     - "upstream: 192.168.0.139"
+    entrypoint:
+     - node
+     - /srv/software/offline_sync/src/continuousReplication
