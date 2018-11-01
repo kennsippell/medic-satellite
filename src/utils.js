@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 const makeUrl = (host, path) => (path ? `${host}/${path}` : host);
 const sleep = secs => new Promise(resolve => setTimeout(resolve, secs * 1000));
-const fetchJson = async (url, path) => (await fetch(makeUrl(url, path))).json();
+const fetchJson = async (url, path, options) => (await fetch(makeUrl(url, path), options)).json();
 const tryFetchJson = (...args) => new Promise(resolve => fetchJson(...args).then(resolve).catch(() => resolve(false)));
 
 /* TODO: Can we log urls without the password */
@@ -15,7 +15,22 @@ const waitForUrl = async (pauseFor, host, path) => {
 
 const del3te = (host, path) => fetch(makeUrl(host, path), { method: 'DELETE' });
 
-const put = (host, path, body) => fetch(makeUrl(host, path), {
+const fetchWithStatus = (status, url, path, options) => new Promise((resolve, reject) => fetch(makeUrl(url, path), options)
+  .then((response) => {
+    if (response.error) {
+      const error = JSON.stringify(Object.assign({}, response, { url, path, options }));
+      reject(new Error(error));
+      return;
+    }
+
+    if (status.includes(response.status)) {
+      resolve(response.json());
+    } else {
+      reject(new Error(`Fetch status was ${response.status} but expecting ${status} for ${response.url}`));
+    }
+  }));
+
+const put = (host, path, body, status = [200, 201]) => fetchWithStatus(status, host, path, {
   method: 'PUT',
   body: JSON.stringify(body),
   redirect: 'manual',
@@ -27,7 +42,8 @@ const put = (host, path, body) => fetch(makeUrl(host, path), {
 module.exports = {
   makeUrl,
   sleep,
-  fetchJson,
+  fetch: fetchJson,
+  fetchWithStatus,
   tryFetchJson,
   waitForUrl,
   del3te,

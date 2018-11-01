@@ -3,7 +3,7 @@ const { SATELLITE_COUCH_URL, UPSTREAM_API_URL } = require('./config');
 
 const {
   makeUrl,
-  fetchJson,
+  fetch,
   put,
   del3te,
 } = require('./utils');
@@ -30,7 +30,9 @@ const replicate = (db, tag = '', options) => {
 
 const clear = async () => {
   console.log('Clearing existing replications');
-  const existing = await fetchJson(SATELLITE_COUCH_URL, '_replicator/_all_docs');
+  const existing = await fetch(SATELLITE_COUCH_URL, '_replicator/_all_docs');
+
+  if (!existing.rows) return Promise.resolve();
   const deletes = existing.rows
     .filter(row => !row.id.startsWith('_design'))
     .map(row => del3te(SATELLITE_COUCH_URL, `/_replicator/${row.id}?rev=${row.value.rev}`));
@@ -39,14 +41,14 @@ const clear = async () => {
 
 const localDocs = async () => {
   console.log('Syncing local document');
-  const securityDoc = await fetchJson(UPSTREAM_API_URL, 'medic/_security');
+  const securityDoc = await fetch(UPSTREAM_API_URL, 'medic/_security');
   return put(SATELLITE_COUCH_URL, 'medic/_security', securityDoc);
 };
 
 const metaDbs = async (options) => {
   console.log('Syncing meta databases');
   /* TODO: This is going to start a billion relications at once on real data (one per offline user) */
-  const allDbs = await fetchJson(UPSTREAM_API_URL, '_all_dbs');
+  const allDbs = await fetch(UPSTREAM_API_URL, '_all_dbs');
   const metaReplications = allDbs
     .filter(db => db.startsWith('medic-user-'))
     .map(db => replicate(db, 'meta', options));

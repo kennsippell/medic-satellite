@@ -1,6 +1,6 @@
 const {
   sleep,
-  fetchJson,
+  fetchWithStatus,
   waitForUrl,
   put,
 } = require('./utils');
@@ -16,10 +16,14 @@ process.on('unhandledRejection', console.error);
   await waitForUrl(5, SATELLITE_COUCH_URL);
   console.log('CouchDB launch confirmed');
 
-  await replicate.clear();
+  console.log('Stubbing databases');
+  const stub = db => put(SATELLITE_COUCH_URL, db, undefined, [201, 412]);
+  await stub('_replicator');
+  await stub('_users');
+  await stub('medic');
+  await stub('medic-audit');
 
-  console.log('Stubbing audit database');
-  await put(SATELLITE_COUCH_URL, 'medic-audit');
+  await replicate.clear();
 
   console.log('Starting initial replication ...');
   await replicate.replicate('medic', 'medic');
@@ -32,7 +36,7 @@ process.on('unhandledRejection', console.error);
   let jobs;
   do {
     await sleep(5);
-    jobs = await fetchJson(SATELLITE_COUCH_URL, '_scheduler/jobs');
+    jobs = await fetchWithStatus([200], SATELLITE_COUCH_URL, '_scheduler/jobs');
 
     const typeCount = jobs.jobs.reduce((agg, job) => {
       const jobType = job.history[0].type;

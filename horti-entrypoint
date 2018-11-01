@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm /root/.horticulturalist.lock 2> /dev/null
-/srv/software/horticulturalist/bin/svc-stop medic-api
+/srv/software/horticulturalist/bin/svc-stop medic-api 2> /dev/null
 
 echo Launching initial replication script
 cd /srv/software/offline_sync
