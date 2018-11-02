@@ -3,6 +3,7 @@
 
 This workflow turns your local machine into a Medic Satellite.
 
+1. Build webapp from source using `grunt build deploy`, not standard dev build.
 1. Start services for standard [medic-webapp](https://github.com/medic/medic-webapp) developer workflow.
 2. Set `[couch_httpd_auth]/secret` to match the secret of your local CouchDB in `couchdb-local.ini`.
 3. Create some local aliases to work from in `/etc/hosts`.

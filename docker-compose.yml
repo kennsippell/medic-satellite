@@ -25,6 +25,7 @@ services:
     environment:
      - COUCH_NODE_NAME=couchdb@satellite
      - COUCH_URL=http://medic:pwd123@couch:5984/medic
+     - API_SKIP_STARTUP=1
     ports:
      - "6988:5988"
     extra_hosts:
