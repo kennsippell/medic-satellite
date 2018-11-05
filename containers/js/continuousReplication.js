@@ -21,8 +21,6 @@ console.log(`Config: Meta-${FREQUENCY_META}s Local-${FREQUENCY_LOCAL_DOCS}s`);
   await replicate.replicate('medic', 'medic', { continuous: true });
   await replicate.replicate('medic', 'medic', { continuous: true, push: true });
 
-  replicate.replicate('medic', { continuous: true });
-  replicate.replicate('medic', { continuous: true, push: true });
   setInterval(replicate.metaDbs, FREQUENCY_META * 1000);
   setInterval(replicate.localDocs, FREQUENCY_LOCAL_DOCS * 1000);
   setInterval(() => replicate.replicate('_users', 'users'), FREQUENCY_USERS * 1000);
