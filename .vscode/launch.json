@@ -8,14 +8,14 @@
       "type": "node",
       "request": "launch",
       "name": "Initial Replication",
-      "program": "${workspaceFolder}/src/initialReplication",
+      "program": "${workspaceFolder}/containers/js/initialReplication",
       "envFile": "${workspaceFolder}/.vscode/.env"
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Continuous Replication",
-      "program": "${workspaceFolder}/src/continuousReplication",
+      "program": "${workspaceFolder}/containers/js/continuousReplication",
       "envFile": "${workspaceFolder}/.vscode/.env"
     }
   ]

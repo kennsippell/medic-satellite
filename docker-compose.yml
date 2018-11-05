@@ -1,16 +1,16 @@
-version: '3'
+version: '3.3'
 services:
   couch:
     image: apache/couchdb:2.2.0
     container_name: couch
     volumes:
-     - ./couchdb-local.ini:/opt/couchdb/etc/local.ini
+     - ./containers/couchdb-local.ini:/opt/couchdb/etc/local.ini
     ports:
      - "6984:5984"
     expose:
      - 5984
     extra_hosts:
-     - "upstream: 192.168.0.139"
+     - "upstream: ${UPSTREAM_HOST}"
 
   horti:
     image: node:8
@@ -19,17 +19,19 @@ services:
      - couch
     volumes:
      - ~/horticulturalist:/srv/software/horticulturalist
-     - .:/srv/software/offline_sync
+     - ./containers:/srv/software/offline_sync
     entrypoint: /bin/bash
     command: "/srv/software/offline_sync/horti-entrypoint"
     environment:
-     - COUCH_NODE_NAME=couchdb@satellite
-     - COUCH_URL=http://medic:pwd123@couch:5984/medic
      - API_SKIP_STARTUP=1
+     - COUCH_NODE_NAME=couchdb@satellite
+
+     - SATELLITE_COUCH_URL=http://medic:pwd123@COUCH:5984
+     - UPSTREAM_API_URL=http://admin:pass@UPSTREAM:5988
     ports:
      - "6988:5988"
     extra_hosts:
-     - "upstream: 192.168.0.139"
+     - "upstream: ${UPSTREAM_HOST}"
 
   sync:
     image: node:8
@@ -38,9 +40,13 @@ services:
      - couch
      - horti
     volumes:
-     - .:/srv/software/offline_sync
+     - ./containers:/srv/software/offline_sync
     extra_hosts:
-     - "upstream: 192.168.0.139"
+     - "upstream: ${UPSTREAM_HOST}"
     entrypoint:
      - node
-     - /srv/software/offline_sync/src/continuousReplication
+     - /srv/software/offline_sync/js/continuousReplication
+    environment:
+      - SATELLITE_COUCH_URL=http://medic:pwd123@COUCH:5984
+      - SATELLITE_API_URL=http://HORTI:5988
+  

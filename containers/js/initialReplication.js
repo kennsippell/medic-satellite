@@ -5,13 +5,15 @@ const {
   put,
 } = require('./utils');
 
-const { SATELLITE_COUCH_URL } = require('./config');
+const { SATELLITE_COUCH_URL, UPSTREAM_API_URL } = require('./config');
 const replicate = require('./replicate');
 
 console.log('Medic Satellite Server -- Initial Replication');
 process.on('unhandledRejection', console.error);
 
 (async () => {
+  console.log(`Waiting for connectivity to upstream service at ${UPSTREAM_API_URL}`);
+  await waitForUrl(5, `${UPSTREAM_API_URL}/medic/settings`);
   console.log(`Waiting for CouchDB service at ${SATELLITE_COUCH_URL}`);
   await waitForUrl(5, SATELLITE_COUCH_URL);
   console.log('CouchDB launch confirmed');
