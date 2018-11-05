@@ -14,9 +14,12 @@ $(cd containers/js && npm i)
 ```
 
 ### (Optional) Trust the new certificate authority
+To avoid security warnings with the certificates:
 
-**In Chrome:** Settings > Manage Certificates > Authorities > Import > Select medic-satellite/config/root-ca.crt
-**Local commands:** `./scripts/trust-ca.sh`
+
+**For Chrome:** Settings > Manage Certificates > Authorities > Import > Select medic-satellite/config/root-ca.crt
+
+**For local commands:** `./scripts/trust-ca.sh`
 
 ## Running
 
@@ -29,6 +32,7 @@ This workflow uses your standard `medic-webapp` services as an upstream service 
 3. Create some local aliases to work from in `/etc/hosts`.
 ```
 127.0.0.1       upstream
+127.0.0.1       dev.satellite.local
 127.0.0.1       satellite
 127.0.0.1       couch
 ```
@@ -40,5 +44,5 @@ Url | Simulates
 -- | ---
 `http://upstream:5988` | Upstream API endpoint
 `http://upstream:5984` | Upstream CouchDB
-`http://satellite:6988` | Satellite API endpoint
+`https://dev.satellite.local` | Satellite API endpoint
 `http://satellite:6984` | Satellite CouchDB

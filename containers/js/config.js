@@ -18,10 +18,4 @@ const config = {
   FREQUENCY_USERS,
 };
 
-const unassigned = Object.keys(config).map(key => config[key]).filter(val => !val);
-if (unassigned.length > 0) {
-  console.log(`${unassigned.join(',')} environment variables must be defined`);
-  process.exit(-1);
-}
-
 module.exports = config;

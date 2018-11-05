@@ -26,8 +26,8 @@ services:
      - API_SKIP_STARTUP=1
      - COUCH_NODE_NAME=couchdb@satellite
 
-     - SATELLITE_COUCH_URL=http://medic:pwd123@COUCH:5984
-     - UPSTREAM_API_URL=http://admin:pass@UPSTREAM:5988
+     - SATELLITE_COUCH_URL=http://medic:pwd123@couch:5984
+     - UPSTREAM_API_URL=http://admin:pass@upstream:5988
     ports:
      - "6988:5988"
     extra_hosts:
@@ -47,6 +47,25 @@ services:
      - node
      - /srv/software/offline_sync/js/continuousReplication
     environment:
-      - SATELLITE_COUCH_URL=http://medic:pwd123@COUCH:5984
-      - SATELLITE_API_URL=http://HORTI:5988
+      - SATELLITE_COUCH_URL=http://medic:pwd123@couch:5984
+      - SATELLITE_API_URL=http://horti:5988
+    
+  nginx:
+    image: nginx
+    container_name: nginx
+    links:
+     - horti
+    ports:
+     - 443:443
+    volumes:
+     - ./containers/nginx.conf:/etc/nginx/conf.d/default.conf
+    secrets:
+     - nginx.crt
+     - nginx.key
+  
+secrets:
+  nginx.crt:
+    file: "./config/${CONFIGURATION:-dev}/satellite.crt"
+  nginx.key:
+    file: "./config/${CONFIGURATION:-dev}/satellite.key"
   

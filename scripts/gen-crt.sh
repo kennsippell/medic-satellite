@@ -12,4 +12,4 @@ openssl req -new -key "./config/$CONFIG_NAME/satellite.key" -out "./config/$CONF
 echo Sign the satellite certificate.
 openssl x509 -req -days 750 -in "./config/$CONFIG_NAME/satellite.csr" -sha256 \
     -CA ./config/root-ca.crt -CAkey ./config/root-ca.key  -CAcreateserial \
-    -out "./config/$CONFIG_NAME/satellite.crt" -extfile ./config/site.cnf -extensions server
+    -out "./config/$CONFIG_NAME/satellite.crt" -extfile ./scripts/site.cnf -extensions server

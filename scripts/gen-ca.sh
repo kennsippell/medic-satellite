@@ -11,6 +11,6 @@ openssl req \
 
 echo Sign a CA certificate
 openssl x509 -req  -days 365 -in ./config/root-ca.csr \
-              -signkey ./config/root-ca.key -sha256 -out ./config/root-ca.crt \
-              -extfile ./config/root-ca.cnf -extensions \
-              root_ca
+        -signkey ./config/root-ca.key -sha256 -out ./config/root-ca.crt \
+        -extfile ./scripts/root-ca.cnf -extensions \
+        root_ca

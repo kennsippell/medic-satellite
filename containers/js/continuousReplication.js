@@ -14,7 +14,7 @@ console.log('Starting continuous replication ...');
 console.log(`Config: Meta-${FREQUENCY_META}s Local-${FREQUENCY_LOCAL_DOCS}s`);
 
 (async () => {
-  console.log(`Waiting for CouchDB service at ${SATELLITE_API_URL}`);
+  console.log(`Waiting for satellite service at ${SATELLITE_API_URL}`);
   await waitForUrl(5, SATELLITE_API_URL, 'login');
   console.log('CouchDB launch confirmed');
 
