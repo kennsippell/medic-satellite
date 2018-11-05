@@ -1,1 +1,5 @@
+.srl
 node_modules/
+**/*.key
+**/*.csr
+**/*.crt
