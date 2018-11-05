@@ -1,9 +1,29 @@
 # Medic Mobile Offline Sync
-## For Developers
 
-This workflow turns your local machine into a Medic Satellite.
+## Development Environment Setup
 
-1. Build webapp from source using `grunt build deploy`, not standard dev build.
+```shell
+# Install node_modules for JavaScript
+$(cd containers/js && npm i)
+
+# Generate a local signing authority certificate
+./scripts/gen-ca.sh
+
+# Generate a certificates for dev mode
+./scripts/gen-crt.sh dev
+```
+
+### (Optional) Trust the new certificate authority
+
+**In Chrome:** Settings > Manage Certificates > Authorities > Import > Select medic-satellite/config/root-ca.crt
+**Local commands:** `./scripts/trust-ca.sh`
+
+## Running
+
+### Developer Mode
+This workflow uses your standard `medic-webapp` services as an upstream service and hosts the Medic Satellite docker container locally.
+
+1. Build `medic-webapp` from source using `grunt build deploy`, not standard dev build.
 1. Start services for standard [medic-webapp](https://github.com/medic/medic-webapp) developer workflow.
 2. Set `[couch_httpd_auth]/secret` to match the secret of your local CouchDB in `couchdb-local.ini`.
 3. Create some local aliases to work from in `/etc/hosts`.
