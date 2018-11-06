@@ -48,8 +48,8 @@ services:
      - /srv/software/offline_sync/js/continuousReplication
     environment:
       - SATELLITE_COUCH_URL=http://medic:pwd123@couch:5984
-      - SATELLITE_API_URL=http://horti:5988
       - UPSTREAM_API_URL=http://admin:pass@upstream:5988
+      - SATELLITE_API_URL=http://horti:5988
     
   nginx:
     image: nginx
