@@ -3,12 +3,17 @@
 rm /root/.horticulturalist.lock 2> /dev/null
 /srv/software/horticulturalist/bin/svc-stop medic-api 2> /dev/null
 
-echo Launching initial replication script
-cd /srv/software/offline_sync
-node js/initialReplication || { echo 'FATAL: Initial replication failure'; exit -1; }
+# Initial replication requires the upstream service to be available
+# Restarting the horti container in the field may be useful while offline, when upstream is not available
+INITIAL_REPLICATION_STATE="/srv/software/rep.state"
+if [ ! -f $INITIAL_REPLICATION_STATE ]; then
+  echo Launching initial replication script
+  cd /srv/software/offline_sync
+  node js/initialReplication || { echo 'FATAL: Initial replication failure'; exit -1; }
+  touch $INITIAL_REPLICATION_STATE
+fi
 
 export COUCH_URL="${SATELLITE_COUCH_URL}/medic"
-
 echo Launching horticulturalist
 cd /srv/software/horticulturalist
 node src --satellite || { echo 'FATAL: Horticulturalist failure'; exit -1; }
