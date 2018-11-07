@@ -7,15 +7,22 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Initial Replication",
+      "name": "Initial Replication Container",
       "program": "${workspaceFolder}/containers/js/initialReplication",
       "envFile": "${workspaceFolder}/.vscode/.env"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Continuous Replication",
+      "name": "Continuous Replication Container",
       "program": "${workspaceFolder}/containers/js/continuousReplication",
+      "envFile": "${workspaceFolder}/.vscode/.env"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "API Container",
+      "program": "${workspaceFolder}/containers/js/api",
       "envFile": "${workspaceFolder}/.vscode/.env"
     }
   ]

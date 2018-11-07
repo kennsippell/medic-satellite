@@ -12,33 +12,48 @@ services:
     extra_hosts:
      - "upstream: ${UPSTREAM_HOST}"
 
-  horti:
+  initRep:
     image: node:8
-    container_name: horti
+    container_name: initRep
     links:
      - couch
+    extra_hosts:
+     - "upstream: ${UPSTREAM_HOST}"
     volumes:
      - ~/horticulturalist:/srv/software/horticulturalist
      - ./containers:/srv/software/offline_sync
-    entrypoint: /bin/bash
-    command: "/srv/software/offline_sync/horti-entrypoint"
+    entrypoint:
+     - node
+     - /srv/software/offline_sync/js/initialReplication
+    environment:
+     - SATELLITE_COUCH_URL=http://medic:pwd123@couch:5984
+     - UPSTREAM_API_URL=http://admin:pass@upstream:5988
+
+  api:
+    image: node:8
+    container_name: api
+    links:
+     - couch
+    volumes:
+     - ./containers:/srv/software/offline_sync
+     - ~/webapp/api:/srv/software/medic-api
+    entrypoint:
+     - node
+     - /srv/software/offline_sync/js/api
     environment:
      - API_SKIP_STARTUP=1
      - COUCH_NODE_NAME=couchdb@satellite
-
-     - SATELLITE_COUCH_URL=http://medic:pwd123@couch:5984
-     - UPSTREAM_API_URL=http://admin:pass@upstream:5988
+     - COUCH_URL=http://medic:pwd123@couch:5984/medic
+     - API_PORT=5988
     ports:
      - "6988:5988"
-    extra_hosts:
-     - "upstream: ${UPSTREAM_HOST}"
 
   sync:
     image: node:8
     container_name: sync
     links:
      - couch
-     - horti
+     - api
     volumes:
      - ./containers:/srv/software/offline_sync
     extra_hosts:
@@ -49,13 +64,13 @@ services:
     environment:
       - SATELLITE_COUCH_URL=http://medic:pwd123@couch:5984
       - UPSTREAM_API_URL=http://admin:pass@upstream:5988
-      - SATELLITE_API_URL=http://horti:5988
+      - SATELLITE_API_URL=http://api:5988
     
   nginx:
     image: nginx
     container_name: nginx
     links:
-     - horti
+     - api
     ports:
      - 443:443
     volumes:

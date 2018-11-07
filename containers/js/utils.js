@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const pathLib = require('path');
 
 const makeUrl = (host, path) => (path ? `${host}/${path}` : host);
 const sleep = secs => new Promise(resolve => setTimeout(resolve, secs * 1000));
@@ -48,4 +49,5 @@ module.exports = {
   waitForUrl,
   del3te,
   put,
+  replicationStatus: dir => pathLib.normalize(pathLib.join(dir, 'initialReplication.status')),
 };

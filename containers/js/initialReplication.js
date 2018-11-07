@@ -1,11 +1,14 @@
+const fs = require('fs');
+
 const {
   sleep,
   fetchWithStatus,
   waitForUrl,
   put,
+  replicationStatus,
 } = require('./utils');
 
-const { SATELLITE_COUCH_URL, UPSTREAM_API_URL } = require('./config');
+const { SATELLITE_COUCH_URL, UPSTREAM_API_URL, STATUS_FILE_DIRECTORY } = require('./config');
 const replicate = require('./replicate');
 
 console.log('Medic Satellite Server -- Initial Replication');
@@ -53,4 +56,13 @@ process.on('unhandledRejection', console.error);
     const typeStatus = types.length > 0 ? `Status: ${types.join('-')} ${types.map(type => typeCount[type]).join('-')}` : 'Done!';
     console.log(`Awaiting replications. ${typeStatus || ''} ${hopelessStatus || ''}`);
   } while (hopelessCount < jobs.total_rows);
+
+  // TODO: View Warming
 })();
+
+const statusFilePath = replicationStatus(STATUS_FILE_DIRECTORY);
+console.log(`Writing replication status to ${statusFilePath}`);
+fs.writeFileSync(statusFilePath, new Date().getTime());
+
+// We just rocked out.
+process.exit(666);

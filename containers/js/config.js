@@ -7,6 +7,8 @@ const config = {
   FREQUENCY_META: 6 * Hours,
   FREQUENCY_LOCAL_DOCS: 24 * Hours,
   FREQUENCY_USERS: 1 * Hours,
+  STATUS_FILE_DIRECTORY: '/srv/software/',
+  API_PATH: '/srv/software/medic-api',
 };
 
 const updateConfigFromSource = src => Object.keys(config)
