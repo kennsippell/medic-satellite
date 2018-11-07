@@ -4,7 +4,7 @@
   "description": "Code for the Medic Mobile Offline Sync Project",
   "main": "src/index.js",
   "scripts": {
-    "up": "UPSTREAM_HOST=$(ip route get 8.8.8.8 | cut -d' ' -f 7) CONFIGURATION=dev docker-compose up",
+    "compose": "UPSTREAM_HOST=$(ip route get 8.8.8.8 | cut -d' ' -f 7) CONFIGURATION=dev docker-compose",
     "down": "docker-compose down",
     "restart": "docker-compose restart horti",
     "test": "mocha **/*.spec.js"
@@ -17,5 +17,10 @@
   "bugs": {
     "url": "https://github.com/medic/medic-satellite"
   },
-  "homepage": "https://github.com/medic/medic-satellite"
+  "homepage": "https://github.com/medic/medic-satellite",
+  "dev-dependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "sinon": "^7.1.1"
+  }
 }
