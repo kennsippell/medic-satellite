@@ -20,8 +20,8 @@ services:
     extra_hosts:
      - "upstream: ${UPSTREAM_HOST}"
     volumes:
-     - ~/horticulturalist:/srv/software/horticulturalist
      - ./containers:/srv/software/offline_sync
+     - ./status:/srv/status
     entrypoint:
      - node
      - /srv/software/offline_sync/js/initialReplication
@@ -36,7 +36,8 @@ services:
      - couch
     volumes:
      - ./containers:/srv/software/offline_sync
-     - ~/webapp/api:/srv/software/medic-api
+     # - ~/webapp/api:/srv/software/medic-api
+     - ./status:/srv/status
     entrypoint:
      - node
      - /srv/software/offline_sync/js/api

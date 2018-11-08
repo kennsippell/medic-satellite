@@ -7,7 +7,7 @@ const config = {
   FREQUENCY_META: 6 * Hours,
   FREQUENCY_LOCAL_DOCS: 24 * Hours,
   FREQUENCY_USERS: 1 * Hours,
-  STATUS_FILE_DIRECTORY: '/srv/software/',
+  STATUS_FILE_DIRECTORY: '/srv/status',
   API_PATH: '/srv/software/medic-api',
 };
 

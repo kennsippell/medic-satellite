@@ -4,17 +4,27 @@ const {
   sleep,
   fetchWithStatus,
   waitForUrl,
+  extractAttachmentToFolder,
   put,
   replicationStatus,
 } = require('./utils');
 
-const { SATELLITE_COUCH_URL, UPSTREAM_API_URL, STATUS_FILE_DIRECTORY } = require('./config');
+const {
+  SATELLITE_COUCH_URL,
+  UPSTREAM_API_URL,
+  API_PATH,
+  STATUS_FILE_DIRECTORY
+} = require('./config');
 const replicate = require('./replicate');
 
 console.log('Medic Satellite Server -- Initial Replication');
 process.on('unhandledRejection', console.error);
+const statusFilePath = replicationStatus(STATUS_FILE_DIRECTORY);
 
 (async () => {
+  console.log(`Clearing status file at ${statusFilePath}`);
+  fs.unlink(statusFilePath);
+
   console.log(`Waiting for connectivity to upstream service at ${UPSTREAM_API_URL}`);
   await waitForUrl(5, `${UPSTREAM_API_URL}/medic/settings`);
   console.log(`Waiting for CouchDB service at ${SATELLITE_COUCH_URL}`);
@@ -58,11 +68,9 @@ process.on('unhandledRejection', console.error);
   } while (hopelessCount < jobs.total_rows);
 
   // TODO: View Warming
+  console.log(`Writing replication status to ${statusFilePath}`);
+  fs.writeFileSync(statusFilePath, new Date().getTime());
+
+  // We just rocked out.
+  process.exit(666);
 })();
-
-const statusFilePath = replicationStatus(STATUS_FILE_DIRECTORY);
-console.log(`Writing replication status to ${statusFilePath}`);
-fs.writeFileSync(statusFilePath, new Date().getTime());
-
-// We just rocked out.
-process.exit(666);
