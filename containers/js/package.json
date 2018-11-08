@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Javscript running within the Medic Satellite docker containers",
   "dependencies": {
+    "decompress": "^4.2.0",
     "eslint-plugin-import": "^2.14.0",
     "node-fetch": "^2.2.0",
     "pouchdb": "^7.0.0",

@@ -36,13 +36,15 @@ services:
      - couch
     volumes:
      - ./containers:/srv/software/offline_sync
-     # - ~/webapp/api:/srv/software/medic-api
      - ./status:/srv/status
     entrypoint:
      - node
      - /srv/software/offline_sync/js/api
     environment:
      - API_SKIP_STARTUP=1
+     - SKIP_API_EXTRACTION=0
+     - API_PATH=/srv/software/medic-api
+     - SATELLITE_COUCH_URL=http://medic:pwd123@couch:5984
      - COUCH_NODE_NAME=couchdb@satellite
      - COUCH_URL=http://medic:pwd123@couch:5984/medic
      - API_PORT=5988

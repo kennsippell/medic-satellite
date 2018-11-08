@@ -9,6 +9,7 @@ const config = {
   FREQUENCY_USERS: 1 * Hours,
   STATUS_FILE_DIRECTORY: '/srv/status',
   API_PATH: '/srv/software/medic-api',
+  SKIP_API_EXTRACTION: 0,
 };
 
 const updateConfigFromSource = src => Object.keys(config)

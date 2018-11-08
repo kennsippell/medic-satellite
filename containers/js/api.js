@@ -4,10 +4,29 @@ const { fork } = require('child_process');
 const {
   replicationStatus,
   sleep,
+  deleteFolder,
+  downloadArchiveToFolder,
 } = require('./utils');
-const { API_PATH, STATUS_FILE_DIRECTORY } = require('./config');
+const {
+  API_PATH,
+  STATUS_FILE_DIRECTORY,
+  SKIP_API_EXTRACTION,
+  SATELLITE_COUCH_URL,
+} = require('./config');
 
 console.log('Medic Satellite Server -- API Container');
+
+const extractApiFromCouch = async () => {
+  if (SKIP_API_EXTRACTION !== '1') {
+    if (fs.existsSync(API_PATH)) {
+      deleteFolder(API_PATH);
+    }
+    fs.mkdirSync(API_PATH);
+    await downloadArchiveToFolder(SATELLITE_COUCH_URL, 'medic/_design/medic/medic-api-0.1.0.tgz', API_PATH);
+  } else {
+    console.log('Skipping API extraction as folder already exists.');
+  }
+};
 
 (async () => {
   const statusFilePath = replicationStatus(STATUS_FILE_DIRECTORY);
@@ -18,6 +37,9 @@ console.log('Medic Satellite Server -- API Container');
 
   while (true) {
     try {
+      console.log('Extracting API code from Couch');
+      await extractApiFromCouch();
+
       const server = fork(`${API_PATH}/server.js`, ['--allow-cors'], {
         stdio: 'pipe',
       });

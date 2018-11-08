@@ -4,7 +4,6 @@ const {
   sleep,
   fetchWithStatus,
   waitForUrl,
-  extractAttachmentToFolder,
   put,
   replicationStatus,
 } = require('./utils');
@@ -12,18 +11,35 @@ const {
 const {
   SATELLITE_COUCH_URL,
   UPSTREAM_API_URL,
-  API_PATH,
-  STATUS_FILE_DIRECTORY
+  STATUS_FILE_DIRECTORY,
 } = require('./config');
 const replicate = require('./replicate');
 
-console.log('Medic Satellite Server -- Initial Replication');
+console.log('Medic Satellite Server -- Initial Replication Container');
 process.on('unhandledRejection', console.error);
 const statusFilePath = replicationStatus(STATUS_FILE_DIRECTORY);
 
+const waitForReplications = async () => {
+  let jobs;
+  do {
+    await sleep(5);
+    jobs = await fetchWithStatus([200], SATELLITE_COUCH_URL, '_scheduler/jobs');
+
+    const typeCount = jobs.jobs.reduce((agg, job) => {
+      const jobType = job.history[0].type;
+      agg[jobType] = (agg[jobType] || 0) + 1; // eslint-disable-line no-param-reassign
+      return agg;
+    }, {});
+
+    const types = Object.keys(typeCount);
+    const typeStatus = types.length > 0 ? `Status: ${types.join('-')} ${types.map(type => typeCount[type]).join('-')}` : 'Done!';
+    console.log(`Awaiting replications to complete. ${typeStatus || ''}`);
+  } while (jobs.total_rows > 0);
+};
+
 (async () => {
   console.log(`Clearing status file at ${statusFilePath}`);
-  fs.unlink(statusFilePath);
+  if (fs.existsSync(statusFilePath)) fs.unlink(statusFilePath);
 
   console.log(`Waiting for connectivity to upstream service at ${UPSTREAM_API_URL}`);
   await waitForUrl(5, `${UPSTREAM_API_URL}/medic/settings`);
@@ -46,31 +62,12 @@ const statusFilePath = replicationStatus(STATUS_FILE_DIRECTORY);
   await replicate.metaDbs();
   await replicate.localDocs();
 
-  const HopelessCrashCount = 10;
-  let hopelessCount;
-  let jobs;
-  do {
-    await sleep(5);
-    jobs = await fetchWithStatus([200], SATELLITE_COUCH_URL, '_scheduler/jobs');
-
-    const typeCount = jobs.jobs.reduce((agg, job) => {
-      const jobType = job.history[0].type;
-      agg[jobType] = (agg[jobType] || 0) + 1; // eslint-disable-line no-param-reassign
-      return agg;
-    }, {});
-
-    hopelessCount = jobs.jobs.filter(job => job.history.filter(history => history.type === 'crashed').length > HopelessCrashCount).length;
-    const hopelessStatus = hopelessCount > 0 && `(${hopelessCount} crashed >${HopelessCrashCount} times).`;
-
-    const types = Object.keys(typeCount);
-    const typeStatus = types.length > 0 ? `Status: ${types.join('-')} ${types.map(type => typeCount[type]).join('-')}` : 'Done!';
-    console.log(`Awaiting replications. ${typeStatus || ''} ${hopelessStatus || ''}`);
-  } while (hopelessCount < jobs.total_rows);
+  await waitForReplications();
 
   // TODO: View Warming
-  console.log(`Writing replication status to ${statusFilePath}`);
+
+  console.log(`Writing completion status to ${statusFilePath}`);
   fs.writeFileSync(statusFilePath, new Date().getTime());
 
-  // We just rocked out.
   process.exit(666);
 })();

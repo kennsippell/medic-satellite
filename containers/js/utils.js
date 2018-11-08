@@ -1,5 +1,7 @@
+const fs = require('fs');
 const fetch = require('node-fetch');
 const pathLib = require('path');
+const decompress = require('decompress');
 
 const makeUrl = (host, path) => (path ? `${host}/${path}` : host);
 const sleep = secs => new Promise(resolve => setTimeout(resolve, secs * 1000));
@@ -40,12 +42,44 @@ const put = (host, path, body, status = [200, 201]) => fetchWithStatus(status, h
   },
 });
 
+const deleteFolder = (path) => {
+  if (fs.existsSync(path)) {
+    fs.readdirSync(path).forEach((file) => {
+      const curPath = `${path}/${file}`;
+      if (fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolder(curPath);
+      } else {
+        fs.unlinkSync(curPath);
+      }
+    });
+
+    fs.rmdirSync(path);
+  }
+};
+
+const downloadToFolder = async (host, path, destination) => {
+  const fetchUrl = makeUrl(host, path);
+  const fetched = await fetch(fetchUrl);
+  if (fetched.status !== 200) throw `Failed to download API archive: ${fetchUrl}`;
+
+  const content = await fetched.buffer();
+  const archivePath = `${destination}/fetched.tgz`;
+  const wstream = fs.createWriteStream(archivePath);
+  wstream.write(content);
+  wstream.end();
+  await new Promise(resolve => wstream.on('close', resolve));
+
+  return decompress(archivePath, destination, { strip: 1 });
+};
+
 module.exports = {
   makeUrl,
   sleep,
   fetch: fetchJson,
   fetchWithStatus,
   tryFetchJson,
+  downloadToFolder,
+  deleteFolder,
   waitForUrl,
   del3te,
   put,
