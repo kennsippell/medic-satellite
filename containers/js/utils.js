@@ -57,7 +57,7 @@ const deleteFolder = (path) => {
   }
 };
 
-const downloadToFolder = async (host, path, destination) => {
+const downloadArchiveToFolder = async (host, path, destination) => {
   const fetchUrl = makeUrl(host, path);
   const fetched = await fetch(fetchUrl);
   if (fetched.status !== 200) throw `Failed to download API archive: ${fetchUrl}`;
@@ -78,7 +78,7 @@ module.exports = {
   fetch: fetchJson,
   fetchWithStatus,
   tryFetchJson,
-  downloadToFolder,
+  downloadArchiveToFolder,
   deleteFolder,
   waitForUrl,
   del3te,
